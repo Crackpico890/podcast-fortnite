@@ -8,3 +8,5 @@ x-profile/
 pc_agent/state.json
 pc_agent/out/
 .pytest_cache/
+data/episodios/
+data/music/
