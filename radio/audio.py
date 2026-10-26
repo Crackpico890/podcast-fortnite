@@ -10,10 +10,12 @@ Formato del guion (texto plano, una intervención por línea):
 Las líneas vacías y las que empiezan por # se ignoran. Lo que va entre paréntesis
 (acotaciones como "(ríe)") no se lee. [MUSICA nombre] mete data/music/<nombre>.mp3 si existe.
 
-Voces: si hay GEMINI_API_KEY en .env, Gemini TTS con dos voces distintas que leen cada bloque
+Voces, por orden: ElevenLabs (ELEVENLABS_API_KEY; modo diálogo de Eleven v3, se interrumpen y
+se ríen), Gemini TTS con dos voces distintas que leen cada bloque
 como una conversación (entiende las acotaciones: se ríe de verdad). Si no, o si Gemini falla,
-edge-tts (gratis, sin clave), frase a frase. Se eligen con VOZ_<PRESENTADOR> (edge) y
-VOZ_GEMINI_<PRESENTADOR> (Gemini). ffmpeg sale del paquete imageio-ffmpeg si no está instalado.
+edge-tts (gratis, sin clave), frase a frase. Se eligen con VOZ_<PRESENTADOR> (edge),
+VOZ_GEMINI_<PRESENTADOR> (Gemini) y VOZ_ELEVEN_<PRESENTADOR> (id de voz de ElevenLabs; si
+falta, se eligen solas dos voces masculinas de España de la biblioteca). ffmpeg sale del paquete imageio-ffmpeg si no está instalado.
 """
 
 import asyncio
@@ -161,6 +163,95 @@ def gemini_block(lines: list[Part], out: Path) -> None:
     _run(["-f", "s16le", "-ar", "24000", "-ac", "1", "-i", pcm.as_posix(), out.as_posix()])
 
 
+ELEVEN_API = "https://api.elevenlabs.io/v1"
+ELEVEN_MAX_CHARS = 1900  # el modo diálogo admite unos 2000 caracteres por llamada
+# Acotaciones del guion -> etiquetas que entiende Eleven v3. Lo que no está aquí va tal cual.
+ELEVEN_TAGS = {
+    "ríe": "laughs", "se ríe": "laughs", "risas": "laughs", "interrumpe": "interrupting",
+    "con sorna": "sarcastic", "suspira": "sighs", "emocionado": "excited", "grita": "shouting",
+}
+_eleven_voices: dict[str, str] = {}
+
+
+def eleven_text(raw: str) -> str:
+    return STAGE_RE.sub(lambda m: f"[{ELEVEN_TAGS.get(m.group(0)[1:-1].strip().lower(), m.group(0)[1:-1].strip())}]", raw)
+
+
+def _eleven_headers() -> dict:
+    return {"xi-api-key": env("ELEVENLABS_API_KEY")}
+
+
+def spanish_voices(limit: int = 30) -> list[dict]:
+    """Voces masculinas con acento de España de la biblioteca pública, las más usadas primero."""
+    import httpx
+
+    r = httpx.get(f"{ELEVEN_API}/shared-voices", headers=_eleven_headers(), timeout=60,
+                  params={"page_size": 100, "language": "es", "gender": "male", "sort": "cloned_by_count"})
+    r.raise_for_status()
+    spain = re.compile(r"spain|españa|peninsular|castil|madrid|es-es", re.I)
+    voices = [v for v in r.json().get("voices", [])
+              if spain.search(" ".join(str(v.get(k, "")) for k in ("accent", "locale", "description", "name")))]
+    return voices[:limit]
+
+
+def eleven_voice(speaker: str) -> str:
+    """Id de la voz de ElevenLabs de cada presentador. Si no está en .env, coge una de España y la añade."""
+    if env(f"VOZ_ELEVEN_{speaker}"):
+        return env(f"VOZ_ELEVEN_{speaker}")
+    if speaker not in _eleven_voices:
+        import httpx
+
+        taken = set(_eleven_voices.values())
+        pick = next(v for v in spanish_voices() if v["voice_id"] not in taken)
+        r = httpx.post(f"{ELEVEN_API}/voices/add/{pick['public_owner_id']}/{pick['voice_id']}",
+                       headers=_eleven_headers(), json={"new_name": f"Radio Fortnite {speaker.title()}"}, timeout=60)
+        r.raise_for_status()
+        _eleven_voices[speaker] = r.json()["voice_id"]
+        log.info("ElevenLabs: %s usa la voz %s (%s)", speaker, pick.get("name"), _eleven_voices[speaker])
+    return _eleven_voices[speaker]
+
+
+def eleven_block(lines: list[Part], out: Path, tmp: Path) -> None:
+    """Un bloque de diálogo con el modo diálogo de ElevenLabs, en trozos de menos de 2000 caracteres."""
+    import httpx
+
+    chunks: list[list[Part]] = [[]]
+    for p in lines:
+        if chunks[-1] and sum(len(x.raw) for x in chunks[-1]) + len(p.raw) > ELEVEN_MAX_CHARS:
+            chunks.append([])
+        chunks[-1].append(p)
+    files, previous = [], []
+    for i, chunk in enumerate(chunks):
+        body = {
+            "model_id": env("ELEVEN_MODEL") or "eleven_v3",
+            "language_code": "es",
+            "inputs": [{"text": eleven_text(p.raw), "voice_id": eleven_voice(p.speaker)} for p in chunk],
+        }
+        if previous:
+            body["previous_request_ids"] = previous[-3:]
+        r = httpx.post(f"{ELEVEN_API}/text-to-dialogue", headers=_eleven_headers(), json=body, timeout=300)
+        r.raise_for_status()
+        if r.headers.get("request-id"):
+            previous.append(r.headers["request-id"])
+        mp3 = tmp / f"{out.stem}-{i:02d}.mp3"
+        mp3.write_bytes(r.content)
+        files.append(mp3)
+    listing = tmp / f"{out.stem}-list.txt"
+    listing.write_text("".join(f"file '{f.as_posix()}'\n" for f in files))
+    _run(["-f", "concat", "-safe", "0", "-i", listing.as_posix(), "-ar", "24000", "-ac", "1", out.as_posix()])
+
+
+def engines(forced: str | None = None) -> list[str]:
+    if forced:
+        return [forced]
+    out = []
+    if env("ELEVENLABS_API_KEY"):
+        out.append("eleven")
+    if env("GEMINI_API_KEY"):
+        out.append("gemini")
+    return out + ["edge"]
+
+
 def blocks(parts: list[Part]) -> list[list[Part]]:
     """Agrupa el guion en bloques de diálogo separados por la música."""
     out: list[list[Part]] = []
@@ -189,15 +280,16 @@ def _run(args: list[str]) -> None:
     subprocess.run([ffmpeg(), "-hide_banner", "-loglevel", "error", "-y", *args], check=True)
 
 
-def render(script: str, out: Path) -> Path:
-    """Genera el MP3 final. Devuelve la ruta."""
+def render(script: str, out: Path, engine: str | None = None, max_blocks: int | None = None) -> Path:
+    """Genera el MP3 final. engine fuerza un motor (eleven, gemini, edge); max_blocks corta para pruebas."""
     parts = parse(script)
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
         silence = tmp / "pause.wav"
         _run(["-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", str(PAUSE_SECONDS), silence.as_posix()])
         pieces = []
-        use_gemini = bool(env("GEMINI_API_KEY"))
+        order = engines(engine)
+        talk = 0
         for n, block in enumerate(blocks(parts)):
             p = block[0]
             if not p.speaker:
@@ -211,15 +303,25 @@ def render(script: str, out: Path) -> Path:
                 else:
                     log.warning("Falta la música %s: se salta", music)
                 continue
-            if use_gemini:
+            talk += 1
+            if max_blocks and talk > max_blocks:
+                break
+            for name in order:
                 wav = tmp / f"{n:04d}.wav"
                 try:
-                    gemini_block(block, wav)
+                    if name == "eleven":
+                        eleven_block(block, wav, tmp)
+                    elif name == "gemini":
+                        gemini_block(block, wav)
+                    else:
+                        pieces += _edge_block(block, tmp, n, silence)
+                        break
                     pieces += [wav, silence]
-                    continue
-                except Exception as exc:  # noqa: BLE001 - si Gemini falla, el programa sale igual con edge-tts
-                    log.warning("Gemini falló en el bloque %d (%s): uso edge-tts", n, exc)
-            pieces += _edge_block(block, tmp, n, silence)
+                    break
+                except Exception as exc:  # noqa: BLE001 - si un motor falla, el programa sale igual con el siguiente
+                    log.warning("%s falló en el bloque %d (%s): pruebo el siguiente", name, n, exc)
+            else:
+                raise RuntimeError(f"Ningún motor de voz pudo con el bloque {n}")
         listing = tmp / "list.txt"
         listing.write_text("".join(f"file '{p.as_posix()}'\n" for p in pieces))
         out.parent.mkdir(parents=True, exist_ok=True)

@@ -3,73 +3,81 @@
 # Fuentes (van en la descripción del episodio, nunca se dicen en voz alta): Liquipedia (CC BY-SA),
 # Fortnite Tracker, Hotspawn, esports.gg, Fortnite Comp Report y r/FortniteCompetitive.
 # Música: Kevin MacLeod (incompetech.com), CC BY 4.0. Sin resultados inventados.
+# Estilo: dos colegas charlando, frases cortas, se interrumpen, muletillas. Nada de "sección tal".
 
 [MUSICA intro]
-JAVI: ¡Buenos días, buenas tardes y buenas noches, que esto es Fortnite y aquí nadie duerme! Estáis escuchando Radio Fortnite, el programa número uno. Literalmente, porque es el primero.
-DANI: (ríe) Y empezamos fuerte, Javi. Primer programa y ya nos toca semana de final de la FNCS.
-JAVI: Conmigo, como siempre, bueno, como siempre desde hoy, Dani. El hombre que tiene una teoría: que la zona le persigue.
-DANI: No es una teoría, es un hecho. La zona sabe dónde estoy. Lo tengo comprobado.
-JAVI: Pues hoy vas a tener datos para defenderte, porque hay alguien que ha estudiado la zona en serio. Pero vamos por partes. Esto es lo que ha pasado de viernes a domingo en el competitivo.
+JAVI: ¡Venga, venga, venga! Buenas a todos, esto es Radio Fortnite, programa uno. Y conmigo el de siempre... bueno, el de siempre desde hoy.
+DANI: (ríe) El de siempre desde hace cinco minutos. ¿Qué tal, Javi?
+JAVI: Pues con ganas, tío, porque vaya semanita nos espera.
+DANI: Hombre, es que hoy empieza la final de la FNCS en solo, ¿no?
+JAVI: Hoy y mañana. Y ojo, que hay españoles. Muchos.
+DANI: ¿Muchos cuántos?
+JAVI: Espera, espera, que te lo cuento bien. Primero, el bote.
+DANI: Lo del dinero, que es lo que me importa a mí.
+JAVI: (ríe) En Europa se reparten doscientos cincuenta y tres mil quinientos dólares. Y el que gane, sesenta mil para él solito.
+DANI: Sesenta mil... Y en solo, eh. Que aquí no le puedes echar la culpa al dúo.
+JAVI: Ya, ya. Aquí si la lías, la has liado tú.
+DANI: Tú o la zona, Javi. Que la zona tiene mucha culpa de muchas cosas.
+JAVI: Ya empezamos con la zona...
+DANI: ¡Es que es verdad! La zona me odia, lo digo siempre.
+JAVI: Bueno, a lo que iba. Cien jugadores, seis partidas hoy, seis mañana. Europa juega esta tarde-noche y los de Norteamérica, de madrugada.
+DANI: O sea, que mañana te levantas y ya sabes quién va primero.
+JAVI: Eso es. Y ahora sí, lo de los nuestros.
 [MUSICA cortinilla]
-
-JAVI: Lo primero, lo gordo. Hoy lunes y mañana martes se juega la gran final de la FNCS en solitario. Cien jugadores por región, seis partidas cada día, doce en total.
-DANI: Y con premio, que es lo que me gusta. Solo en Europa hay en juego doscientos cincuenta y tres mil quinientos dólares. Y el que gane se lleva sesenta mil.
-JAVI: Sesenta mil dólares por ganar en solitario. Sin dúo al que echarle la culpa.
-DANI: Eso es lo peor del solo, Javi. Si mueres, la culpa es tuya. O de la zona.
-JAVI: Siempre la zona. En total, entre todas las regiones, la final reparte más de seiscientos mil dólares. Europa juega hoy por la tarde-noche, y Norteamérica de madrugada, hora española.
-DANI: O sea, que mañana por la mañana te contamos quién va primero. Ese es el trato.
+JAVI: Cinco. Tenemos cinco españoles en la final de Europa.
+DANI: ¡Venga ya! ¿Cinco?
+JAVI: Cinco. Scary, Adrx, Syaaz, poloo y Xaizz.
+DANI: Pero eso es un escuadrón entero y te sobra uno para el banquillo, tío.
+JAVI: (ríe) Y el de Scary tiene mérito, eh. Entra por la Last Chance, la última oportunidad, la del lunes pasado. Pasaban veintidós... y él queda tercero.
+DANI: ¿Tercero? En la última bala, con toda la presión... Eso es tener sangre fría.
+JAVI: Los otros cuatro vienen de los heats. poloo por el primero, y Adrx, Syaaz y Xaizz por el segundo.
+DANI: Oye, y lo de Xaizz...
+JAVI: Lo de Xaizz es de película.
+DANI: Es que en el Fast Track, el día diez, queda noventa y nueve. ¡Noventa y nueve! Y ahora está en la final.
+JAVI: Eso es no rendirse, chaval.
+DANI: Yo a Xaizz le llamo desde ya "el Remontadas". Que conste en acta.
+JAVI: (ríe) Apuntado queda. Y también hay que acordarse de los que se quedaron a nada.
+DANI: Mickie, ¿no?
+JAVI: Mickie, del NStar, se queda el veintisiete en la Last Chance. A cinco puestos.
+DANI: Cinco puestos... Eso es lo que tardas en decir "me ha tirado la zona".
+JAVI: (ríe) No falla. También Vegeta, de ATC, el treinta y uno. Alemany, de FERA, el sesenta. Y Fernandinho...
+DANI: Uf, lo de Fernandinho.
+JAVI: Once en el Fast Track, cuando pasaban ocho. Y luego en la Last Chance, el cincuenta y nueve.
+DANI: Duele, duele. Pero bueno, esto no acaba aquí, quedan muchos torneos.
 [MUSICA cortinilla]
-
-JAVI: Y ahora la sección que más nos importa. Los nuestros.
-DANI: ¡Los nuestros! ¿Tenemos españoles en la final?
-JAVI: Tenemos. El lunes pasado, día veinte, se jugó la Last Chance Qualifier de Europa, la última oportunidad para entrar. Pasaban los veintidós primeros.
-DANI: Veintidós plazas para media Europa. Eso es más difícil que encontrar un cofre azul en el que no haya una pistola gris.
-JAVI: (ríe) Pues tenemos cinco, Dani. Cinco españoles en la gran final de Europa: Scary, Adrx, Syaaz, poloo y Xaizz.
-DANI: ¡Cinco! Eso ya es un escuadrón entero, y sobra uno para el banquillo.
-JAVI: Y Scary ha entrado por la puerta grande: tercero en esa Last Chance, de toda la clasificatoria.
-DANI: Tercero en la última oportunidad. Eso es jugar con presión y salir sonriendo.
-JAVI: Los otros cuatro llegan por los heats. poloo, por el Heat 1. Y Adrx, de KoS Esports, Syaaz y Xaizz, por el Heat 2.
-DANI: Y ojo a Xaizz, que en el Fast Track del día diez había quedado en el puesto noventa y nueve, y aun así se ha metido en la final.
-JAVI: Del noventa y nueve a la final. Eso es no rendirse nunca.
-DANI: A Xaizz le pongo yo de mote "el Remontadas". Cinco banderas españolas hoy en el lobby.
-DANI: Pues a los cinco les vamos a seguir con lupa en las seis partidas de hoy.
-JAVI: Y los que se quedaron a las puertas. Mickie, del NStar Talent Program, terminó vigésimo séptimo en esa Last Chance. Cinco puestos.
-DANI: Cinco puestos. Eso es lo que tardas en decir "me ha tirado la zona".
-JAVI: Vegeta, de ATC eSports, trigésimo primero. Alemany, de FERA eSports, sexagésimo. Y Fernandinho, que en el Fast Track del día diez había quedado undécimo, a tres puestos de entrar directo, se quedó en el cincuenta y nueve en la Last Chance.
-DANI: Lo de Fernandinho duele. Undécimo en el Fast Track, cuando pasaban ocho. Pero bueno, hay más torneos, y vamos a estar ahí para contarlo.
+JAVI: Y de fuera, ¿a quién vigilamos hoy?
+DANI: Yo a shxrk. Ganó el Fast Track, el primero de los ocho que entraron directos.
+JAVI: Y la Last Chance la ganó Chap, el suizo. Segundo, Ryuma, británico.
+DANI: Pues eso, si hoy gana shxrk, lo dije yo primero.
+JAVI: Perdona, pero eso lo he dicho yo.
+DANI: Ya, pero yo lo he apuntado. Y eso cuenta más.
+JAVI: (ríe) Qué morro tienes.
+DANI: Y oye, hablando de la zona...
+JAVI: Ya está otra vez.
+DANI: ¡No, no, escucha, que esto es serio! Uno de la comunidad competitiva ha cogido mil quinientas partidas de FNCS en solo y ha hecho un mapa de hacia dónde puede tirar la zona.
+JAVI: ¿Mil quinientas? Eso es más de lo que has jugado tú en tu vida.
+DANI: (ríe) Mentira... Bueno, es verdad. Pero escucha, que tiene miga. Si sabes dónde la zona casi nunca acaba, no caes ahí pensando en el final de la partida. Caes en un sitio desde el que puedas rotar hacia donde más se repite.
+JAVI: Y en solo eso vale oro, porque no tienes compañero que te cante nada. Rotar pronto y por el lado bueno es media partida.
+DANI: Pues eso. A partir de hoy no me quejo de la zona: la estudio.
+JAVI: ¿En serio?
+DANI: Bueno... me sigo quejando. Pero con datos.
 [MUSICA cortinilla]
-
-JAVI: El resto de Europa. ¿Quién viene fuerte a la final?
-DANI: La Last Chance la ganó Chap, suizo, y segundo fue Ryuma, británico. Y del Fast Track, el diez de octubre, salieron directos ocho: shxrk primero, luego Bimbo, Akiira, Flex, Sky, Pixie, wolvax y Kenrop.
-JAVI: shxrk, que ganó el Fast Track. Ese es de los que hay que vigilar hoy.
-DANI: Apuntado. Si gana shxrk, yo lo dije primero.
-JAVI: No lo has dicho tú, lo he dicho yo.
-DANI: Pero yo lo he apuntado. Eso cuenta.
-[MUSICA cortinilla]
-
-JAVI: Más torneos del fin de semana. Se jugó el primer evento de las Arenas Cash Cup. Empezó Oceanía el viernes y el domingo siguieron Brasil, Norteamérica Central y Norteamérica Oeste.
-DANI: Las Cash Cups de Arenas, para el que no lo sepa, son la puerta de entrada para el que viene desde abajo. Ahí se ven caras nuevas.
-JAVI: Y una noticia para ir apuntando en el calendario: ya hay fechas para la FNCS en solitario de Reload. Primera ronda de clasificatorias el tres y el cuatro de noviembre, segunda ronda el siete y tercera el ocho. Y los mil primeros del Power Ranking se saltan la primera ronda.
-DANI: O sea, que el que esté en el top mil se ahorra un día de sufrimiento. Un día menos de zona.
-[MUSICA cortinilla]
-
-JAVI: Y ahora, Dani, tu momento. Análisis táctico.
-DANI: ¡Por fin! Atención, porque esto me da la razón. Alguien de la comunidad competitiva ha cogido mil quinientas partidas de la FNCS en solitario y ha dibujado un mapa de hacia dónde puede moverse la zona.
-JAVI: Mil quinientas partidas. Eso es más de lo que has jugado tú en tu vida.
-DANI: Eso es mentira. Bueno, es verdad. Pero la idea es buenísima. Si sabes dónde no va a acabar nunca la zona, no aterrizas ahí pensando en el final. Eliges un spot que te deje rotar hacia las zonas que más se repiten.
-JAVI: Para una final en solitario es oro. En solo no tienes compañero que te dé información, así que rotar pronto y por el borde bueno es media partida.
-DANI: Exacto. Y yo, a partir de hoy, en vez de quejarme de la zona, voy a estudiarla. Bueno, voy a seguir quejándome, pero con datos.
-[MUSICA cortinilla]
-
-JAVI: Una cosa más de la comunidad. Hay jugadores con dudas sobre la Ranked Cup de Cero Construcción. Uno cuenta que subió de bronce a diamante en diez partidas, quedó segundo, y solo le dieron el paraguas y la mochila, no la skin.
-DANI: Subir de bronce a diamante en diez partidas y que no te den la skin. Eso sí que es una tragedia, Javi.
-JAVI: Si alguien de Epic lo aclara, os lo contamos. Que de momento es solo una duda de un jugador.
-[MUSICA cortinilla]
-
-JAVI: Y en España, fichajes y movimientos del fin de semana: no hemos detectado ninguno. Ni fichajes, ni salidas, ni cambios de región. Si sabéis de alguno, aquí estamos.
-DANI: Que esté tranquilo el mercado este fin de semana no quiere decir que lo esté el que viene. Después de una final, siempre hay movimientos.
-JAVI: Y eso es todo por hoy. Esta tarde, gran final de la FNCS en solitario, con Scary, Adrx, Syaaz, poloo y Xaizz defendiendo la bandera.
-DANI: Y mañana, aquí, os contamos cómo les ha ido. Si la zona les respeta.
-JAVI: Esto ha sido Radio Fortnite. Yo soy Javi.
-DANI: Y yo soy Dani, el que tenía razón con la zona. ¡Hasta mañana!
+JAVI: Más cosillas del finde. Arrancaron las Arenas Cash Cup: el viernes Oceanía, y el domingo Brasil y las dos de Norteamérica.
+DANI: Esas me gustan, ¿eh? Ahí es donde sale la gente nueva, el que viene pegando fuerte desde abajo.
+JAVI: Y apuntad en el calendario, que ya hay fechas para la FNCS en solo de Reload. Clasificatorias el tres y el cuatro de noviembre, luego el siete y el ocho.
+DANI: ¿Y no había algo para los del top mil?
+JAVI: Sí, los mil primeros del Power Ranking se saltan la primera ronda.
+DANI: Un día menos de sufrimiento. Un día menos de zona.
+JAVI: (ríe) Otra vez... Y lo último, que hay gente bastante mosqueada con la Ranked Cup de Cero Construcción.
+DANI: ¿Qué ha pasado?
+JAVI: Uno cuenta que sube de bronce a diamante en diez partidas, queda segundo... y solo le dan el paraguas y la mochila. La skin, nada.
+DANI: Hombre, eso es para enfadarse. Subes cuatro rangos y te quedas sin la skin.
+JAVI: A ver si Epic lo aclara, que de momento es lo que cuenta un jugador.
+DANI: Y de fichajes en España, ¿qué?
+JAVI: Nada este finde. Ni fichajes, ni salidas, ni nadie que se cambie de región.
+DANI: Calma total. Pero después de una final siempre se mueve algo, ya verás.
+JAVI: Y si sabéis de algo, nos lo contáis. Bueno, esto ha sido todo. Esta tarde, final de la FNCS con Scary, Adrx, Syaaz, poloo y Xaizz.
+DANI: ¡Vamos, chavales! Y mañana os contamos cómo ha ido. Si la zona les deja, claro.
+JAVI: (ríe) Esto ha sido Radio Fortnite. Yo soy Javi.
+DANI: Y yo Dani, el que tenía razón con la zona. ¡Hasta mañana!
 [MUSICA outro]
