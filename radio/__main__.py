@@ -71,9 +71,19 @@ def main(argv: list[str] | None = None) -> int:
             print(audio.render(src.read_text(encoding="utf-8"), Path("data/episodios") / f"{name}.mp3",
                                engine=args.motor, max_blocks=args.bloques))
         elif args.command == "voces":
+            import httpx
+
             from radio import audio
 
-            for v in audio.spanish_voices():
+            if not env("ELEVENLABS_API_KEY"):
+                print("Falta ELEVENLABS_API_KEY en .env")
+                return 1
+            try:
+                voices = audio.spanish_voices()
+            except httpx.HTTPStatusError as exc:
+                print(f"ElevenLabs respondió {exc.response.status_code}: {exc.response.text[:300]}")
+                return 1
+            for v in voices:
                 print(v["voice_id"], "|", v.get("name"), "|", v.get("accent"), "|", v.get("age"), "|",
                       v.get("descriptive"), "|", v.get("preview_url"))
         elif args.command == "digest":
