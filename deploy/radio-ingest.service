@@ -8,6 +8,10 @@ WorkingDirectory=/opt/podcast-fortnite
 ExecStart=/opt/podcast-fortnite/.venv/bin/python -m radio serve --port 8787
 Restart=always
 RestartSec=5
+# Prioridad baja y límites para no quitarle recursos a otros programas del servidor.
+Nice=10
+CPUQuota=50%
+MemoryMax=1G
 
 [Install]
 WantedBy=multi-user.target

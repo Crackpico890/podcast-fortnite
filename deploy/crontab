@@ -1,14 +1,15 @@
-# Horario del motor de información (hora de Madrid).
-CRON_TZ=Europe/Madrid
+# Horario del motor de información.
+# No depende de la zona horaria del servidor (así no se toca la de otros programas):
+# las horas de Madrid se comprueban con TZ=Europe/Madrid. Todo con prioridad baja (nice).
 SHELL=/bin/bash
 APP=/opt/podcast-fortnite
-PY=/opt/podcast-fortnite/.venv/bin/python
+PY=nice -n 10 /opt/podcast-fortnite/.venv/bin/python
 
 # Cada 30 minutos: recoger y procesar.
 */30 * * * * radio cd $APP && $PY -m radio collect >> data/cron.log 2>&1 && $PY -m radio process >> data/cron.log 2>&1
 
-# Cada día a las 5:00: Liquipedia (lista de españoles y cambios de equipo).
-0 5 * * * radio cd $APP && $PY -m radio liquipedia >> data/cron.log 2>&1 && $PY -m radio process >> data/cron.log 2>&1
+# Una vez al día de madrugada: Liquipedia (lista de españoles y cambios de equipo).
+15 3 * * * radio cd $APP && $PY -m radio liquipedia >> data/cron.log 2>&1 && $PY -m radio process >> data/cron.log 2>&1
 
-# De lunes a viernes a las 6:30: resumen del día por Telegram.
-30 6 * * 1-5 radio cd $APP && $PY -m radio process >> data/cron.log 2>&1 && $PY -m radio digest --send >> data/cron.log 2>&1
+# De lunes a viernes a las 6:30 de Madrid (en verano e invierno): resumen por Telegram.
+30 * * * 1-5 radio [ "$(TZ=Europe/Madrid date +\%H)" = "06" ] && cd $APP && $PY -m radio process >> data/cron.log 2>&1 && $PY -m radio digest --send >> data/cron.log 2>&1
