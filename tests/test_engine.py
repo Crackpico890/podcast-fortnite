@@ -297,3 +297,20 @@ def test_process_can_redo_older_days():
 def test_patch_news_is_kept():
     story = [item("Fortnite hotfix nerfs the shotgun", author="Dexerto")]
     assert rank.relevant(story, [])
+
+
+def test_script_parse_skips_comments_and_stage_directions():
+    from radio import audio
+
+    parts = audio.parse("# nota\n[MUSICA intro]\nJAVI: Hola (ríe) a todos\n\nDANI: (ríe)\nDANI: Adiós")
+    assert [(p.speaker, p.text) for p in parts] == [("", "intro"), ("JAVI", "Hola a todos"), ("DANI", "Adiós")]
+
+
+def test_first_episode_script_is_valid():
+    from pathlib import Path
+
+    from radio import audio
+
+    parts = audio.parse(Path("episodios/2026-10-26.txt").read_text(encoding="utf-8"))
+    assert {p.speaker for p in parts} == {"", "JAVI", "DANI"}
+    assert parts[0].text == "intro" and parts[-1].text == "outro"

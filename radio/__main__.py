@@ -6,6 +6,7 @@
   digest      imprime el resumen de ayer (el lunes, del fin de semana) y lo más importante de la semana;
               --dia AAAA-MM-DD para otro día, --send lo manda por Telegram
   serve       arranca la API que recibe los posts de X desde tu PC
+  audio       convierte un guion en MP3: audio episodios/2026-10-26.txt
 """
 
 import argparse
@@ -34,7 +35,8 @@ def cmd_liquipedia(conn) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="radio", description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("command", choices=["collect", "liquipedia", "process", "digest", "serve"])
+    parser.add_argument("command", choices=["collect", "liquipedia", "process", "digest", "serve", "audio"])
+    parser.add_argument("guion", nargs="?", help="audio: archivo del guion")
     parser.add_argument("--send", action="store_true", help="digest: enviar por Telegram")
     parser.add_argument("--dia", type=date.fromisoformat, help="digest: día a resumir (por defecto, ayer)")
     parser.add_argument("--dias-atras", type=int, help="process: rehacer los últimos N días (por defecto 3)")
@@ -56,6 +58,13 @@ def main(argv: list[str] | None = None) -> int:
             cmd_liquipedia(conn)
         elif args.command == "process":
             print(f"procesados {process.run(conn, days=args.dias_atras)} items nuevos")
+        elif args.command == "audio":
+            from pathlib import Path
+
+            from radio import audio
+
+            src = Path(args.guion)
+            print(audio.render(src.read_text(encoding="utf-8"), Path("data/episodios") / f"{src.stem}.mp3"))
         elif args.command == "digest":
             first, last = (args.dia, args.dia) if args.dia else digest.covered_days()
             grouped = digest.stories(conn, first, last)
