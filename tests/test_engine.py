@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import pytest
 from fastapi.testclient import TestClient
@@ -238,3 +238,41 @@ def test_week_highlights_exclude_what_is_already_told():
     assert [s["headline"] for s in weekly] == ["Peterbot gana la FNCS Major 3"]
     text = digest.render(grouped, NOW.date(), weekly=weekly)
     assert text.index("Cash Cup") < text.index("Lo más importante de la semana en torneos") < text.index("Peterbot")
+
+
+def test_liquipedia_region_change_and_spaniards_abroad():
+    assert liquipedia.region_code("North America Central") == "NAC"
+    assert liquipedia.region_code("NA West") == "NAW"
+    assert liquipedia.region_code("Europe") == "EU"
+    assert liquipedia.region_code("") == "EU"
+
+    class FakeClient:
+        region = "Europe"
+
+        def category(self, title):
+            return ["Zyrex"] if "Players" in title else []
+
+        def wikitext(self, titles):
+            return {t: WIKITEXT.replace("|team=", f"|region={self.region}\n|team=") for t in titles}
+
+    conn = db.connect(":memory:")
+    fake = FakeClient()
+    assert liquipedia.sync(conn, fake) == []
+    fake.region = "North America Central"
+    [change] = liquipedia.sync(conn, fake)
+    assert change.title == "Zyrex cambia de región: deja Europa y se va a competir en Norteamérica Central"
+
+    from radio.entities import load_all
+
+    away = digest.abroad(load_all(conn))
+    assert [e.name for e in away] == ["Zyrex"]
+    text = digest.render({}, date(2026, 10, 25), away=away)
+    assert "Españoles compitiendo fuera de Europa" in text and "Zyrex (NAC, Team Heretics)" in text
+
+
+def test_region_move_news_is_competitive():
+    story = [item("Top EU pro moves to NA to compete next season", author="Dexerto")]
+    tags = set().union(*(rank.tags(i.body) for i in story))
+    assert "region" in tags
+    assert rank.relevant(story, [])
+    assert rank.section(rank.PRENSA, "", tags) == "mundo"

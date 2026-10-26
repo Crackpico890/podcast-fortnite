@@ -24,6 +24,9 @@ KEYWORDS = {
     "polemica": (1.8, r"polem|drama|banead|banned|ban\b|cheat|chet|tramp|descalific|disqualif|sanci"),
     "victoria": (1.6, r"gana|ganan|wins?|won|campe[oó]n|champion|victoria|1st|primer puesto"),
     "torneo": (1.3, r"fncs|major|global championship|lan\b|cash cup|eval cup|final|torneo|tournament|qualif|clasific"),
+    # Jugadores que se van a competir a otra región (otro servidor, a veces otro país).
+    "region": (1.9, r"cambia de regi[oó]n|otra regi[oó]n|se muda a|se va a (na|eu|norteam)|"
+               r"mov(e|es|ing) to (na|eu|north america|europe)|switch(es|ing)? (to )?(na|eu)\b|relocat"),
     "parche": (1.2, r"parche|patch notes|hotfix|nerf|buff|competitive rules|reglas|actualizaci[oó]n v?\d|update v?\d"),
     "rumor": (0.0, r"rumor|rumour|se dice|insider|leak|filtra|sources say|fuentes"),
 }
@@ -79,7 +82,7 @@ def region(entities: list[Entity]) -> str:
 def relevant(items: list[Item], entities: list[Entity]) -> bool:
     if entities or any(i.source in ALWAYS_RELEVANT_SOURCES for i in items):
         return True
-    return any(COMPETITIVE.search(i.body) for i in items)
+    return any(COMPETITIVE.search(i.body) or COMPILED["region"][1].search(i.body) for i in items)
 
 
 def section(lvl: str, reg: str, story_tags: set[str], is_relevant: bool = True) -> str:
@@ -89,7 +92,7 @@ def section(lvl: str, reg: str, story_tags: set[str], is_relevant: bool = True) 
         return "rumores"
     if reg == "ES":
         return "espana"
-    if "parche" in story_tags and not story_tags & {"fichaje", "baja", "victoria"}:
+    if "parche" in story_tags and not story_tags & {"fichaje", "baja", "victoria", "region"}:
         return "juego"
     if story_tags & {"torneo", "victoria"}:
         return "torneos"

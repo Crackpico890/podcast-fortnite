@@ -28,3 +28,10 @@ entidades:
   - {name: Team Heretics, kind: org, aliases: [Heretics], country: ES, region: EU}
   - {name: Team Queso, kind: org, country: ES, region: EU}
   - {name: Movistar KOI, kind: org, aliases: [KOI], country: ES, region: EU, ambiguous: true}
+
+  # Gente conocida de España que juega o habla de Fortnite (pidió kikopico el 2026-10-26 que también
+  # se comenten). Sus noticias cuentan para España aunque no sean de torneos.
+  - {name: TheGrefg, kind: creator, x: TheGrefg, country: ES, region: EU}
+  - {name: Willyrex, kind: creator, x: Willyrex, country: ES, region: EU}
+  - {name: Ibai, kind: creator, aliases: [Ibai Llanos], x: IbaiLlanos, country: ES, region: EU}
+  - {name: AuronPlay, kind: creator, x: auronplay, country: ES, region: EU}
