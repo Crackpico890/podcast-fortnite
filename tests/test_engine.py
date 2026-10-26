@@ -276,3 +276,24 @@ def test_region_move_news_is_competitive():
     assert "region" in tags
     assert rank.relevant(story, [])
     assert rank.section(rank.PRENSA, "", tags) == "mundo"
+
+
+def test_unconfirmed_serious_accusation_stays_off_air():
+    story = [item("Player talks about another player's dad threatening him with violence",
+                  source="reddit:FortniteCompetitive", kind=KIND_COMMUNITY, author="u/alguien")]
+    lvl = rank.level(story, set())
+    assert rank.sensitive(story)
+    assert rank.section(lvl, "", set(), True, rank.sensitive(story)) == "sensible"
+    assert rank.section(rank.CONFIRMADO, "", set(), True, True) != "sensible"
+
+
+def test_process_can_redo_older_days():
+    conn = db.connect(":memory:")
+    db.save_items(conn, [item("Zyrex gana la Cash Cup de FNCS", hours_ago=24 * 5)])
+    assert process.run(conn, NOW) == 0
+    assert process.run(conn, NOW, days=7) == 1
+
+
+def test_patch_news_is_kept():
+    story = [item("Fortnite hotfix nerfs the shotgun", author="Dexerto")]
+    assert rank.relevant(story, [])

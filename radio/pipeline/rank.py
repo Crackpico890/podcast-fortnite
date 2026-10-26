@@ -41,6 +41,13 @@ COMPETITIVE = re.compile(
     r"bote de premios|earnings|ganancias|warlegend|war legends?",
     re.I,
 )
+# Acusaciones graves contra personas reales (muchos jugadores son menores). Si no lo confirma
+# el protagonista, un dato oficial o dos fuentes con un medio, no sale en el programa.
+SENSITIVE = re.compile(
+    r"threat|amenaz|violen|sexual|assault|agres|harass|acos|grooming|pedof|predator|depredador|"
+    r"swat(ted|ting)|doxx|dox\b|suicid|autolesi|self[- ]harm|police|polic[ií]a|arrest|deten|denuncia",
+    re.I,
+)
 ALWAYS_RELEVANT_SOURCES = {"liquipedia", "fortnite-tracker", "reddit:FortniteCompetitive"}
 
 
@@ -82,12 +89,21 @@ def region(entities: list[Entity]) -> str:
 def relevant(items: list[Item], entities: list[Entity]) -> bool:
     if entities or any(i.source in ALWAYS_RELEVANT_SOURCES for i in items):
         return True
-    return any(COMPETITIVE.search(i.body) or COMPILED["region"][1].search(i.body) for i in items)
+    return any(
+        COMPETITIVE.search(i.body) or COMPILED["region"][1].search(i.body) or COMPILED["parche"][1].search(i.body)
+        for i in items
+    )
 
 
-def section(lvl: str, reg: str, story_tags: set[str], is_relevant: bool = True) -> str:
+def sensitive(items: list[Item]) -> bool:
+    return any(SENSITIVE.search(i.body) for i in items)
+
+
+def section(lvl: str, reg: str, story_tags: set[str], is_relevant: bool = True, is_sensitive: bool = False) -> str:
     if not is_relevant:
         return "fuera"
+    if is_sensitive and lvl not in (OFICIAL, CONFIRMADO):
+        return "sensible"
     if lvl == RUMOR:
         return "rumores"
     if reg == "ES":
