@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
-# Instala el motor de información en el VPS (Ubuntu o Debian). Ejecutar como root:
+# Instala el motor de información en el VPS (Ubuntu o Debian).
+# Convive con otros programas del servidor: va en su carpeta, con su propio usuario y su propio
+# Python, no cambia la hora del sistema y tiene límites de CPU y memoria.
+# Ejecutar como root:
 #   git clone https://github.com/Crackpico890/podcast-fortnite /opt/podcast-fortnite
 #   bash /opt/podcast-fortnite/deploy/install.sh
 set -euo pipefail
@@ -9,7 +12,11 @@ cd "$APP"
 
 apt-get update -y
 apt-get install -y python3 python3-venv python3-pip git tzdata cron
-timedatectl set-timezone Europe/Madrid || true
+
+if ! systemctl is-active -q radio-ingest && ss -ltn 2>/dev/null | grep -q ':8787 '; then
+  echo "AVISO: el puerto 8787 ya lo usa otro programa. Cambia --port en deploy/radio-ingest.service." >&2
+  exit 1
+fi
 
 id -u radio >/dev/null 2>&1 || useradd --system --home "$APP" --shell /usr/sbin/nologin radio
 python3 -m venv .venv
