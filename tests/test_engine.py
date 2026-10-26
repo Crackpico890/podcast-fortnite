@@ -155,3 +155,22 @@ def test_ingest_requires_token_and_saves(api):
     assert api.post("/ingest/x", json=[post]).status_code == 401
     r = api.post("/ingest/x", json=[post], headers={"Authorization": "Bearer secreto"})
     assert r.json() == {"received": 1, "new": 1}
+
+
+def test_fetch_retries_once_after_429(monkeypatch):
+    import httpx
+
+    calls = []
+
+    def handler(request):
+        calls.append(request.url)
+        if len(calls) == 1:
+            return httpx.Response(429, headers={"retry-after": "0"})
+        return httpx.Response(200, content=RSS)
+
+    monkeypatch.setattr(feeds.time, "sleep", lambda s: None)
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        assert feeds.fetch("https://www.reddit.com/r/x/new/.rss", client, retry_after_429=True) == RSS
+        assert len(calls) == 2
+        calls.clear()
+        assert feeds.fetch("https://news.example/rss", client) is None  # sin reintento fuera de Reddit
