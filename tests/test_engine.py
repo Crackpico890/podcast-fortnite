@@ -323,3 +323,34 @@ def test_script_blocks_split_on_music_and_keep_stage_directions_for_gemini():
     groups = audio.blocks(parts)
     assert [[p.speaker for p in g] for g in groups] == [[""], ["JAVI", "DANI"], [""], ["JAVI"]]
     assert groups[1][0].raw == "Hola (ríe)" and groups[1][0].text == "Hola"
+
+
+def test_eleven_tags_from_stage_directions():
+    from radio import audio
+
+    assert audio.eleven_text("(ríe) Qué morro (con sorna) tienes") == "[laughs] Qué morro [sarcastic] tienes"
+    assert audio.eleven_text("(susurra) ojo") == "[susurra] ojo"
+
+
+def test_engine_order_and_fallback(monkeypatch, tmp_path):
+    from radio import audio
+
+    monkeypatch.setenv("ELEVENLABS_API_KEY", "x")
+    monkeypatch.setenv("GEMINI_API_KEY", "y")
+    assert audio.engines() == ["eleven", "gemini", "edge"]
+    assert audio.engines("gemini") == ["gemini"]
+
+    used = []
+
+    def boom(*a, **k):
+        used.append("eleven")
+        raise RuntimeError("sin créditos")
+
+    def fake_gemini(block, out):
+        used.append("gemini")
+        audio._run(["-f", "lavfi", "-i", "sine=f=300:d=0.3", "-ar", "24000", "-ac", "1", out.as_posix()])
+
+    monkeypatch.setattr(audio, "eleven_block", boom)
+    monkeypatch.setattr(audio, "gemini_block", fake_gemini)
+    out = audio.render("JAVI: Hola\n[MUSICA nada]\nDANI: Adiós\nJAVI: Venga", tmp_path / "x.mp3", max_blocks=1)
+    assert out.exists() and used == ["eleven", "gemini"]

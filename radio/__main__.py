@@ -6,7 +6,8 @@
   digest      imprime el resumen de ayer (el lunes, del fin de semana) y lo más importante de la semana;
               --dia AAAA-MM-DD para otro día, --send lo manda por Telegram
   serve       arranca la API que recibe los posts de X desde tu PC
-  audio       convierte un guion en MP3: audio episodios/2026-10-26.txt
+  audio       convierte un guion en MP3: audio episodios/2026-10-26.txt [--motor eleven|gemini|edge] [--bloques 2]
+  voces       lista voces masculinas de España de ElevenLabs (id, nombre, acento, muestra)
 """
 
 import argparse
@@ -35,11 +36,13 @@ def cmd_liquipedia(conn) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="radio", description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("command", choices=["collect", "liquipedia", "process", "digest", "serve", "audio"])
+    parser.add_argument("command", choices=["collect", "liquipedia", "process", "digest", "serve", "audio", "voces"])
     parser.add_argument("guion", nargs="?", help="audio: archivo del guion")
     parser.add_argument("--send", action="store_true", help="digest: enviar por Telegram")
     parser.add_argument("--dia", type=date.fromisoformat, help="digest: día a resumir (por defecto, ayer)")
     parser.add_argument("--dias-atras", type=int, help="process: rehacer los últimos N días (por defecto 3)")
+    parser.add_argument("--motor", choices=["eleven", "gemini", "edge"], help="audio: forzar un motor de voz")
+    parser.add_argument("--bloques", type=int, help="audio: solo los N primeros bloques de diálogo (muestra)")
     parser.add_argument("--port", type=int, default=int(env("INGEST_PORT") or 8787), help="serve: puerto")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -64,7 +67,15 @@ def main(argv: list[str] | None = None) -> int:
             from radio import audio
 
             src = Path(args.guion)
-            print(audio.render(src.read_text(encoding="utf-8"), Path("data/episodios") / f"{src.stem}.mp3"))
+            name = src.stem + (f"-{args.motor}" if args.motor else "") + ("-muestra" if args.bloques else "")
+            print(audio.render(src.read_text(encoding="utf-8"), Path("data/episodios") / f"{name}.mp3",
+                               engine=args.motor, max_blocks=args.bloques))
+        elif args.command == "voces":
+            from radio import audio
+
+            for v in audio.spanish_voices():
+                print(v["voice_id"], "|", v.get("name"), "|", v.get("accent"), "|", v.get("age"), "|",
+                      v.get("descriptive"), "|", v.get("preview_url"))
         elif args.command == "digest":
             first, last = (args.dia, args.dia) if args.dia else digest.covered_days()
             grouped = digest.stories(conn, first, last)
