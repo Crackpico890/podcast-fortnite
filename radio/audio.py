@@ -10,12 +10,16 @@ Formato del guion (texto plano, una intervención por línea):
 Las líneas vacías y las que empiezan por # se ignoran. Lo que va entre paréntesis
 (acotaciones como "(ríe)") no se lee. [MUSICA nombre] mete data/music/<nombre>.mp3 si existe.
 
-Voces: edge-tts (gratis, sin clave). Se eligen con VOZ_<PRESENTADOR> en .env, por ejemplo
-VOZ_JAVI=es-ES-AlvaroNeural. ffmpeg sale del paquete imageio-ffmpeg si no está instalado.
+Voces: si hay GEMINI_API_KEY en .env, Gemini TTS con dos voces distintas que leen cada bloque
+como una conversación (entiende las acotaciones: se ríe de verdad). Si no, o si Gemini falla,
+edge-tts (gratis, sin clave), frase a frase. Se eligen con VOZ_<PRESENTADOR> (edge) y
+VOZ_GEMINI_<PRESENTADOR> (Gemini). ffmpeg sale del paquete imageio-ffmpeg si no está instalado.
 """
 
 import asyncio
+import base64
 import logging
+import time
 import re
 import shutil
 import subprocess
@@ -47,6 +51,7 @@ PAUSE_SECONDS = 0.25
 class Part:
     speaker: str  # "" para música
     text: str
+    raw: str = ""  # con acotaciones, para Gemini
 
 
 def parse(script: str) -> list[Part]:
@@ -60,7 +65,7 @@ def parse(script: str) -> list[Part]:
         elif m := LINE_RE.match(line):
             text = re.sub(r"\s+", " ", STAGE_RE.sub("", m.group(2))).strip()
             if text:
-                parts.append(Part(m.group(1), text))
+                parts.append(Part(m.group(1), text, m.group(2).strip()))
     return parts
 
 
@@ -104,6 +109,82 @@ async def _say(text: str, name: str, rate: str, pitch: str, out: Path) -> None:
     await edge_tts.Communicate(text, name, rate=rate, pitch=pitch).save(str(out))
 
 
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+GEMINI_VOICES = {"JAVI": "Charon", "DANI": "Fenrir"}
+GEMINI_STYLE = (
+    "Lee esta conversación de un programa de radio deportiva sobre Fortnite competitivo. "
+    "Dos locutores hombres de España, con acento castellano peninsular, ritmo de radio, mucha energía "
+    "y buen rollo, como dos amigos que se pican. Lo que va entre paréntesis indica cómo decirlo "
+    "(por ejemplo, reírse) y no se lee en voz alta."
+)
+
+
+def gemini_block(lines: list[Part], out: Path) -> None:
+    """Un bloque entero de diálogo en una sola llamada: así suena a conversación y no a frases sueltas."""
+    import httpx
+
+    names = sorted({p.speaker for p in lines})
+    dialogue = "\n".join(f"{p.speaker.title()}: {p.raw}" for p in lines)
+    body = {
+        "contents": [{"parts": [{"text": f"{GEMINI_STYLE}\n\n{dialogue}"}]}],
+        "generationConfig": {
+            "responseModalities": ["AUDIO"],
+            "speechConfig": {
+                "multiSpeakerVoiceConfig": {
+                    "speakerVoiceConfigs": [
+                        {
+                            "speaker": n.title(),
+                            "voiceConfig": {
+                                "prebuiltVoiceConfig": {
+                                    "voiceName": env(f"VOZ_GEMINI_{n}") or GEMINI_VOICES.get(n, "Puck")
+                                }
+                            },
+                        }
+                        for n in names
+                    ]
+                }
+            },
+        },
+    }
+    url = GEMINI_URL.format(model=env("GEMINI_TTS_MODEL") or "gemini-2.5-flash-preview-tts")
+    for attempt in range(3):
+        r = httpx.post(url, params={"key": env("GEMINI_API_KEY")}, json=body, timeout=300)
+        if r.status_code in (429, 500, 503) and attempt < 2:
+            # El plan gratis tiene un límite por minuto: esperamos y reintentamos.
+            time.sleep(30 * (attempt + 1))
+            continue
+        r.raise_for_status()
+        break
+    data = r.json()["candidates"][0]["content"]["parts"][0]["inlineData"]["data"]
+    pcm = out.with_suffix(".pcm")
+    pcm.write_bytes(base64.b64decode(data))
+    _run(["-f", "s16le", "-ar", "24000", "-ac", "1", "-i", pcm.as_posix(), out.as_posix()])
+
+
+def blocks(parts: list[Part]) -> list[list[Part]]:
+    """Agrupa el guion en bloques de diálogo separados por la música."""
+    out: list[list[Part]] = []
+    for p in parts:
+        if not p.speaker:
+            out.append([p])
+        elif out and out[-1][0].speaker:
+            out[-1].append(p)
+        else:
+            out.append([p])
+    return out
+
+
+def _edge_block(lines: list[Part], tmp: Path, n: int, silence: Path) -> list[Path]:
+    pieces = []
+    for i, p in enumerate(lines):
+        mp3 = tmp / f"{n:04d}-{i:03d}.mp3"
+        asyncio.run(_say(p.text, voice(p.speaker), *style(p.speaker), mp3))
+        wav = tmp / f"{n:04d}-{i:03d}.wav"
+        _run(["-i", mp3.as_posix(), "-ar", "24000", "-ac", "1", wav.as_posix()])
+        pieces += [wav, silence]
+    return pieces
+
+
 def _run(args: list[str]) -> None:
     subprocess.run([ffmpeg(), "-hide_banner", "-loglevel", "error", "-y", *args], check=True)
 
@@ -116,7 +197,9 @@ def render(script: str, out: Path) -> Path:
         silence = tmp / "pause.wav"
         _run(["-f", "lavfi", "-i", "anullsrc=r=24000:cl=mono", "-t", str(PAUSE_SECONDS), silence.as_posix()])
         pieces = []
-        for n, p in enumerate(parts):
+        use_gemini = bool(env("GEMINI_API_KEY"))
+        for n, block in enumerate(blocks(parts)):
+            p = block[0]
             if not p.speaker:
                 music = MUSIC_DIR / f"{p.text}.mp3"
                 if music.exists():
@@ -128,11 +211,15 @@ def render(script: str, out: Path) -> Path:
                 else:
                     log.warning("Falta la música %s: se salta", music)
                 continue
-            mp3 = tmp / f"{n:04d}.mp3"
-            asyncio.run(_say(p.text, voice(p.speaker), *style(p.speaker), mp3))
-            wav = tmp / f"{n:04d}.wav"
-            _run(["-i", mp3.as_posix(), "-ar", "24000", "-ac", "1", wav.as_posix()])
-            pieces += [wav, silence]
+            if use_gemini:
+                wav = tmp / f"{n:04d}.wav"
+                try:
+                    gemini_block(block, wav)
+                    pieces += [wav, silence]
+                    continue
+                except Exception as exc:  # noqa: BLE001 - si Gemini falla, el programa sale igual con edge-tts
+                    log.warning("Gemini falló en el bloque %d (%s): uso edge-tts", n, exc)
+            pieces += _edge_block(block, tmp, n, silence)
         listing = tmp / "list.txt"
         listing.write_text("".join(f"file '{p.as_posix()}'\n" for p in pieces))
         out.parent.mkdir(parents=True, exist_ok=True)
