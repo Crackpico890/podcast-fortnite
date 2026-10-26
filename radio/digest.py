@@ -87,6 +87,12 @@ def week(conn: sqlite3.Connection, first: date, already: dict[str, list[dict]]) 
     return [_with_links(conn, s) for s in rows if s["id"] not in told][:WEEK_HIGHLIGHTS]
 
 
+def abroad(entities) -> list:
+    """Españoles que compiten fuera de Europa: el programa los sigue igual que a los de casa."""
+    return sorted((e for e in entities if e.is_spanish and e.kind == "player" and e.region not in ("", "EU")),
+                  key=lambda e: e.name.lower())
+
+
 def _line(s: dict) -> str:
     first = s["links"][0]["url"] if s["links"] else ""
     n = len({(l["author"] or l["source"]) for l in s["links"]})
@@ -95,7 +101,9 @@ def _line(s: dict) -> str:
     return f"• [{mark}] {html.escape(s['headline'])} ({n} fuente{'s' if n != 1 else ''}){link}"
 
 
-def render(grouped: dict[str, list[dict]], first: date, last: date | None = None, weekly: list[dict] = ()) -> str:
+def render(
+    grouped: dict[str, list[dict]], first: date, last: date | None = None, weekly: list[dict] = (), away: list = ()
+) -> str:
     """Texto en HTML simple para Telegram."""
     last = last or first
     when = f"el {first:%d/%m/%Y}" if first == last else f"del {first:%d/%m} al {last:%d/%m/%Y}"
@@ -114,6 +122,9 @@ def render(grouped: dict[str, list[dict]], first: date, last: date | None = None
     if weekly:
         lines.append("\n<b>Lo más importante de la semana en torneos</b>")
         lines += [_line(s) for s in weekly]
+    if away:
+        names = ", ".join(f"{e.name} ({e.region}{', ' + e.team if e.team else ''})" for e in away)
+        lines.append(f"\n<b>Españoles compitiendo fuera de Europa</b>\n{html.escape(names)}")
     return "\n".join(lines)
 
 

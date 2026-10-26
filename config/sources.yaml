@@ -9,6 +9,11 @@ google_news:
   - {q: "FNCS Fortnite", hl: en, gl: US}
   - {q: "Fortnite pro joins team", hl: en, gl: US}
   - {q: "WarLegend Fortnite", hl: fr, gl: FR}
+  # Españoles que se van a competir a otra región, y gente conocida de España.
+  - {q: "jugador español Fortnite", hl: es, gl: ES}
+  - {q: "Fortnite España streamer", hl: es, gl: ES}
+  - {q: "Spanish Fortnite player", hl: en, gl: US}
+  - {q: "Fortnite pro switches region", hl: en, gl: US}
 
 # Subreddits (vía RSS público).
 reddit:

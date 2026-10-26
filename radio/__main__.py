@@ -1,7 +1,7 @@
 """Uso: python -m radio <comando>
 
   collect     recoge de todas las fuentes gratuitas (cada 30 min)
-  liquipedia  sincroniza españoles de Liquipedia y detecta cambios de equipo (1 vez al día)
+  liquipedia  sincroniza españoles de Liquipedia y detecta cambios de equipo y de región (1 vez al día)
   process     une duplicados, asigna nivel, sección y puntuación
   digest      imprime el resumen de ayer (el lunes, del fin de semana) y lo más importante de la semana;
               --dia AAAA-MM-DD para otro día, --send lo manda por Telegram
@@ -29,7 +29,7 @@ def cmd_collect(conn) -> None:
 
 def cmd_liquipedia(conn) -> None:
     items = liquipedia.sync(conn)
-    print(f"cambios de equipo detectados: {len(items)}, nuevos {db.save_items(conn, items)}")
+    print(f"cambios de equipo o región detectados: {len(items)}, nuevos {db.save_items(conn, items)}")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -58,7 +58,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "digest":
             first, last = (args.dia, args.dia) if args.dia else digest.covered_days()
             grouped = digest.stories(conn, first, last)
-            text = digest.render(grouped, first, last, digest.week(conn, first, grouped))
+            weekly = digest.week(conn, first, grouped)
+            text = digest.render(grouped, first, last, weekly, digest.abroad(load_all(conn)))
             print(text)
             if args.send and not digest.send_telegram(text):
                 return 1

@@ -1,4 +1,4 @@
-"""Liquipedia Fortnite: jugadores españoles, sus equipos y cambios de equipo.
+"""Liquipedia Fortnite: jugadores españoles, sus equipos, cambios de equipo y de región.
 
 Normas de Liquipedia: User-Agent con contacto, gzip, como mucho 1 petición cada 2 segundos
 y citar la fuente (CC BY-SA). Ver https://liquipedia.net/api-terms-of-use
@@ -27,6 +27,28 @@ PAUSE_SECONDS = 2.1
 FIELD_RE = re.compile(r"^\|\s*([a-z_0-9]+)\s*=\s*(.*?)\s*$", re.M)
 LINK_RE = re.compile(r"\[\[(?:[^|\]]*\|)?([^\]]+)\]\]")
 
+# Cómo escribe Liquipedia la región de servidor en la que compite cada jugador.
+REGIONS = [
+    ("NAW", r"\bnaw\b|na[ -]west|north america(n)? west"),
+    ("NAC", r"\bnac\b|na[ -]east|na[ -]central|north america|^na$"),
+    ("BR", r"brazil|brasil|^br$"),
+    ("ME", r"middle east|^me$"),
+    ("ASIA", r"asia"),
+    ("OCE", r"oce|oceania"),
+    ("EU", r"europe|^eu$"),
+]
+REGION_NAMES = {"EU": "Europa", "NAC": "Norteamérica Central", "NAW": "Norteamérica Oeste",
+                "BR": "Brasil", "ME": "Oriente Medio", "ASIA": "Asia", "OCE": "Oceanía"}
+
+
+def region_code(text: str) -> str:
+    """'North America Central' -> 'NAC'. Sin dato, Europa, que es donde juegan casi todos los españoles."""
+    text = text.strip().lower()
+    for code, pattern in REGIONS:
+        if text and re.search(pattern, text):
+            return code
+    return "EU"
+
 
 def parse_infobox(wikitext: str) -> dict[str, str]:
     """Saca los campos |clave=valor del infobox (primer bloque {{Infobox ...}})."""
@@ -48,7 +70,7 @@ def entity_from_page(title: str, kind: str, fields: dict[str, str]) -> Entity:
         name=fields.get("id") or fields.get("name") or title,
         kind=kind,
         country="ES",
-        region="EU",
+        region=region_code(fields.get("region", "")),
         team=fields.get("team", ""),
         # Liquipedia solo publica la ubicación si es pública; la guardamos tal cual.
         city=fields.get("location", "") if kind == "player" else "",
@@ -99,7 +121,7 @@ class Client:
 
 
 def sync(conn: sqlite3.Connection, client: Client | None = None) -> list[Item]:
-    """Actualiza la lista de españoles y devuelve un item por cada cambio de equipo detectado."""
+    """Actualiza la lista de españoles y devuelve un item por cada cambio de equipo o de región."""
     client = client or Client()
     now = datetime.now(timezone.utc)
     items = []
@@ -120,6 +142,11 @@ def sync(conn: sqlite3.Connection, client: Client | None = None) -> list[Item]:
             if before is not None and before != entity.team:
                 items.append(team_change_item(entity, before, now))
             db.set_snapshot(conn, key, entity.team, now.isoformat())
+            key = f"liquipedia:region:{entity.id}"
+            before = db.get_snapshot(conn, key)
+            if before is not None and before != entity.region:
+                items.append(region_change_item(entity, before, now))
+            db.set_snapshot(conn, key, entity.region, now.isoformat())
     conn.commit()
     return items
 
@@ -137,6 +164,25 @@ def team_change_item(entity: Entity, before: str, now: datetime) -> Item:
         url=entity.liquipedia,
         title=title,
         text="Cambio de equipo detectado en Liquipedia.",
+        author="Liquipedia",
+        published_at=now,
+        lang="es",
+    )
+
+
+def region_change_item(entity: Entity, before: str, now: datetime) -> Item:
+    """Un español que se va a competir a otro servidor (o que vuelve a Europa)."""
+    to, frm = REGION_NAMES.get(entity.region, entity.region), REGION_NAMES.get(before, before)
+    if entity.region == "EU":
+        title = f"{entity.name} vuelve a competir en Europa tras su etapa en {frm}"
+    else:
+        title = f"{entity.name} cambia de región: deja {frm} y se va a competir en {to}"
+    return Item(
+        source="liquipedia",
+        kind=KIND_DATA,
+        url=entity.liquipedia,
+        title=title,
+        text="Cambio de región detectado en Liquipedia.",
         author="Liquipedia",
         published_at=now,
         lang="es",
