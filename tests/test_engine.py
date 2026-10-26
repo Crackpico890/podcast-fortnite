@@ -212,3 +212,29 @@ def test_day_window_runs_from_6_to_6_in_madrid():
     # A las 6:30 del lunes, "ayer" es el domingo; a las 5:00 todavía es el sábado.
     assert digest.yesterday(datetime(2026, 10, 26, 5, 30, tzinfo=timezone.utc)) == date(2026, 10, 25)
     assert digest.yesterday(datetime(2026, 10, 26, 4, 0, tzinfo=timezone.utc)) == date(2026, 10, 24)
+
+
+def test_monday_covers_the_weekend():
+    from datetime import date
+
+    monday_morning = datetime(2026, 10, 26, 6, 30, tzinfo=timezone.utc)
+    assert digest.covered_days(monday_morning) == (date(2026, 10, 23), date(2026, 10, 25))
+    tuesday_morning = datetime(2026, 10, 27, 6, 30, tzinfo=timezone.utc)
+    assert digest.covered_days(tuesday_morning) == (date(2026, 10, 26), date(2026, 10, 26))
+
+
+def test_week_highlights_exclude_what_is_already_told():
+    conn = db.connect(":memory:")
+    db.save_items(
+        conn,
+        [
+            item("Peterbot gana la FNCS Major 3", author="Dexerto", hours_ago=72),
+            item("Cash Cup EU: resultados", author="AS", hours_ago=1),
+        ],
+    )
+    process.run(conn, NOW)
+    grouped = digest.stories(conn, NOW.date())
+    weekly = digest.week(conn, NOW.date(), grouped)
+    assert [s["headline"] for s in weekly] == ["Peterbot gana la FNCS Major 3"]
+    text = digest.render(grouped, NOW.date(), weekly=weekly)
+    assert text.index("Cash Cup") < text.index("Lo más importante de la semana en torneos") < text.index("Peterbot")

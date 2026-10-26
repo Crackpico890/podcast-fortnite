@@ -3,7 +3,8 @@
   collect     recoge de todas las fuentes gratuitas (cada 30 min)
   liquipedia  sincroniza españoles de Liquipedia y detecta cambios de equipo (1 vez al día)
   process     une duplicados, asigna nivel, sección y puntuación
-  digest      imprime el resumen de ayer (--dia AAAA-MM-DD para otro día, --send lo manda por Telegram)
+  digest      imprime el resumen de ayer (el lunes, del fin de semana) y lo más importante de la semana;
+              --dia AAAA-MM-DD para otro día, --send lo manda por Telegram
   serve       arranca la API que recibe los posts de X desde tu PC
 """
 
@@ -55,8 +56,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "process":
             print(f"procesados {process.run(conn)} items nuevos")
         elif args.command == "digest":
-            day = args.dia or digest.yesterday()
-            text = digest.render(digest.stories(conn, day), day)
+            first, last = (args.dia, args.dia) if args.dia else digest.covered_days()
+            grouped = digest.stories(conn, first, last)
+            text = digest.render(grouped, first, last, digest.week(conn, first, grouped))
             print(text)
             if args.send and not digest.send_telegram(text):
                 return 1
