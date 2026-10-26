@@ -1,0 +1,28 @@
+# Fuentes que se revisan cada 30 minutos. Todas gratis.
+
+# Búsquedas de Google News (sirven de "prensa": Dexerto, Marca eSports, AS, etc.).
+google_news:
+  - {q: "Fortnite competitivo", hl: es, gl: ES}
+  - {q: "Fortnite fichaje", hl: es, gl: ES}
+  - {q: "Fortnite FNCS", hl: es, gl: ES}
+  - {q: "Fortnite esports", hl: en, gl: US}
+  - {q: "FNCS Fortnite", hl: en, gl: US}
+  - {q: "Fortnite pro joins team", hl: en, gl: US}
+
+# Subreddits (vía RSS público).
+reddit:
+  - FortniteCompetitive
+  - FortNiteBR
+
+# Feeds RSS directos (añade aquí webs de noticias que tengan RSS).
+rss: []
+#  - {name: ejemplo, url: "https://ejemplo.com/feed", kind: press}
+
+# Canales de YouTube por channel_id (UCxxxx). Se leen por RSS, sin clave ni límites.
+# Los de jugadores con youtube_channel_id en las semillas se añaden solos.
+youtube_channels: []
+#  - {name: Canal de ejemplo, channel_id: UCxxxxxxxxxxxxxxxxxxxxxx}
+
+# Listas de X que lee el agente de tu PC cada noche (URL completa de la lista).
+x_lists: []
+#  - https://x.com/i/lists/1234567890

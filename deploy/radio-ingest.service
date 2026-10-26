@@ -1,0 +1,13 @@
+[Unit]
+Description=podcast-fortnite: API que recibe los posts de X desde el PC
+After=network-online.target
+
+[Service]
+User=radio
+WorkingDirectory=/opt/podcast-fortnite
+ExecStart=/opt/podcast-fortnite/.venv/bin/python -m radio serve --port 8787
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

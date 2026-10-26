@@ -1,0 +1,16 @@
+# Cuentas y nombres clave del resto de regiones. Mismo formato que espana.yaml.
+# Liquipedia y Fortnite Tracker añaden solos a los pros top de cada región.
+
+entidades:
+  # Oficiales de Epic: lo que publican cuenta como "oficial".
+  - {name: Fortnite, kind: org, x: FortniteGame}
+  - {name: Fortnite Competitive, kind: org, aliases: [FNCompetitive], x: FNCompetitive}
+
+  # Insiders y filtradores conocidos (sus noticias son "rumor" hasta que se confirmen).
+  - {name: HYPEX, kind: creator, x: HYPEX, ambiguous: true}
+  - {name: ShiinaBR, kind: creator, x: ShiinaBR}
+
+  # Algunos pros de NA para empezar.
+  - {name: Peterbot, kind: player, country: US, region: NAC}
+  - {name: Bugha, kind: player, country: US, region: NAC}
+  - {name: Clix, kind: player, country: US, region: NAC}
