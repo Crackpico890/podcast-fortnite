@@ -13,7 +13,7 @@ import sys
 
 from radio import db, digest, process
 from radio.collectors import feeds, game, liquipedia
-from radio.config import sources
+from radio.config import env, sources
 from radio.entities import load_all
 
 
@@ -34,7 +34,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="radio", description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("command", choices=["collect", "liquipedia", "process", "digest", "serve"])
     parser.add_argument("--send", action="store_true", help="digest: enviar por Telegram")
-    parser.add_argument("--port", type=int, default=8787, help="serve: puerto")
+    parser.add_argument("--port", type=int, default=int(env("INGEST_PORT") or 8787), help="serve: puerto")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 

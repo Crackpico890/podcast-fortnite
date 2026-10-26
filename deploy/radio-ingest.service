@@ -5,7 +5,8 @@ After=network-online.target
 [Service]
 User=radio
 WorkingDirectory=/opt/podcast-fortnite
-ExecStart=/opt/podcast-fortnite/.venv/bin/python -m radio serve --port 8787
+EnvironmentFile=/opt/podcast-fortnite/.env
+ExecStart=/opt/podcast-fortnite/.venv/bin/python -m radio serve --port ${INGEST_PORT}
 Restart=always
 RestartSec=5
 # Prioridad baja y límites para no quitarle recursos a otros programas del servidor.
