@@ -24,10 +24,21 @@ KEYWORDS = {
     "polemica": (1.8, r"polem|drama|banead|banned|ban\b|cheat|chet|tramp|descalific|disqualif|sanci"),
     "victoria": (1.6, r"gana|ganan|wins?|won|campe[oó]n|champion|victoria|1st|primer puesto"),
     "torneo": (1.3, r"fncs|major|global championship|lan\b|cash cup|eval cup|final|torneo|tournament|qualif|clasific"),
-    "parche": (1.2, r"parche|patch|update|actualizaci|hotfix|nerf|buff|competitive rules|reglas"),
+    "parche": (1.2, r"parche|patch notes|hotfix|nerf|buff|competitive rules|reglas|actualizaci[oó]n v?\d|update v?\d"),
     "rumor": (0.0, r"rumor|rumour|se dice|insider|leak|filtra|sources say|fuentes"),
 }
 COMPILED = {k: (w, re.compile(p, re.I)) for k, (w, p) in KEYWORDS.items()}
+
+# Lo que hace que una noticia sea de competitivo. Sin esto ni un jugador o equipo conocido,
+# se descarta (colaboraciones, skins, eventos del juego...).
+COMPETITIVE = re.compile(
+    r"fncs|competiti|esports?|e-sports?|cash cup|eval cup|fncs major|major \d|global championship|\blan\b|"
+    r"torneo|tournament|pro player|jugador(es)? profesional|free agent|agente libre|roster|plantilla|"
+    r"power ranking|leaderboard|clasificaci|qualif|heats?\b|grand finals?|gran final|prize pool|"
+    r"bote de premios|earnings|ganancias|warlegend|war legends?",
+    re.I,
+)
+ALWAYS_RELEVANT_SOURCES = {"liquipedia", "fortnite-tracker", "reddit:FortniteCompetitive"}
 
 
 def tags(text: str) -> set[str]:
@@ -65,7 +76,15 @@ def region(entities: list[Entity]) -> str:
     return regions[0] if regions else ""
 
 
-def section(lvl: str, reg: str, story_tags: set[str]) -> str:
+def relevant(items: list[Item], entities: list[Entity]) -> bool:
+    if entities or any(i.source in ALWAYS_RELEVANT_SOURCES for i in items):
+        return True
+    return any(COMPETITIVE.search(i.body) for i in items)
+
+
+def section(lvl: str, reg: str, story_tags: set[str], is_relevant: bool = True) -> str:
+    if not is_relevant:
+        return "fuera"
     if lvl == RUMOR:
         return "rumores"
     if reg == "ES":

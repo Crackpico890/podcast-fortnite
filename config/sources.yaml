@@ -8,6 +8,7 @@ google_news:
   - {q: "Fortnite esports", hl: en, gl: US}
   - {q: "FNCS Fortnite", hl: en, gl: US}
   - {q: "Fortnite pro joins team", hl: en, gl: US}
+  - {q: "WarLegend Fortnite", hl: fr, gl: FR}
 
 # Subreddits (vía RSS público).
 reddit:

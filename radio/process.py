@@ -64,7 +64,7 @@ def run(conn: sqlite3.Connection, now: datetime | None = None) -> int:
                 headline,
                 lvl,
                 rank.score(c.items, lvl, reg, story_tags, now),
-                rank.section(lvl, reg, story_tags),
+                rank.section(lvl, reg, story_tags, rank.relevant(c.items, entities)),
                 c.story_id,
             ),
         )

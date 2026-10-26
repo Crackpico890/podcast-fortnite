@@ -3,13 +3,15 @@
   collect     recoge de todas las fuentes gratuitas (cada 30 min)
   liquipedia  sincroniza españoles de Liquipedia y detecta cambios de equipo (1 vez al día)
   process     une duplicados, asigna nivel, sección y puntuación
-  digest      imprime el resumen de las últimas 24 h (--send lo manda por Telegram)
+  digest      imprime el resumen de ayer (el lunes, del fin de semana) y lo más importante de la semana;
+              --dia AAAA-MM-DD para otro día, --send lo manda por Telegram
   serve       arranca la API que recibe los posts de X desde tu PC
 """
 
 import argparse
 import logging
 import sys
+from datetime import date
 
 from radio import db, digest, process
 from radio.collectors import feeds, game, liquipedia
@@ -34,6 +36,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="radio", description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("command", choices=["collect", "liquipedia", "process", "digest", "serve"])
     parser.add_argument("--send", action="store_true", help="digest: enviar por Telegram")
+    parser.add_argument("--dia", type=date.fromisoformat, help="digest: día a resumir (por defecto, ayer)")
     parser.add_argument("--port", type=int, default=int(env("INGEST_PORT") or 8787), help="serve: puerto")
     args = parser.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -53,7 +56,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "process":
             print(f"procesados {process.run(conn)} items nuevos")
         elif args.command == "digest":
-            text = digest.render(digest.stories(conn))
+            first, last = (args.dia, args.dia) if args.dia else digest.covered_days()
+            grouped = digest.stories(conn, first, last)
+            text = digest.render(grouped, first, last, digest.week(conn, first, grouped))
             print(text)
             if args.send and not digest.send_telegram(text):
                 return 1

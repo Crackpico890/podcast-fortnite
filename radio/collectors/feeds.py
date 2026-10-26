@@ -3,6 +3,7 @@
 import calendar
 import logging
 import re
+import time
 from datetime import datetime, timezone
 from urllib.parse import quote_plus
 
@@ -51,9 +52,17 @@ def parse_feed(content: str | bytes, source: str, kind: str, lang: str = "") -> 
     return items
 
 
-def fetch(url: str, client: httpx.Client) -> bytes | None:
+REDDIT_PAUSE_SECONDS = 6
+
+
+def fetch(url: str, client: httpx.Client, retry_after_429: bool = False) -> bytes | None:
     try:
         r = client.get(url, timeout=30, follow_redirects=True)
+        if r.status_code == 429 and retry_after_429:
+            # Reddit limita las peticiones seguidas: esperamos lo que pide (máx. 60 s) y probamos una vez más.
+            wait = r.headers.get("retry-after", "")
+            time.sleep(min(int(wait) if wait.isdigit() else 10, 60))
+            r = client.get(url, timeout=30, follow_redirects=True)
         r.raise_for_status()
         return r.content
     except httpx.HTTPError as exc:
@@ -73,8 +82,10 @@ def collect(conf: dict, youtube_ids: list[tuple[str, str]] = ()) -> list[Item]:
             if data := fetch(url, client):
                 items += parse_feed(data, "google-news", KIND_PRESS, g.get("hl", ""))
 
-        for sub in conf.get("reddit", []) or []:
-            if data := fetch(f"https://www.reddit.com/r/{sub}/new/.rss", client):
+        for i, sub in enumerate(conf.get("reddit", []) or []):
+            if i:
+                time.sleep(REDDIT_PAUSE_SECONDS)
+            if data := fetch(f"https://www.reddit.com/r/{sub}/new/.rss", client, retry_after_429=True):
                 items += parse_feed(data, f"reddit:{sub}", KIND_COMMUNITY, "en")
 
         for feed in conf.get("rss", []) or []:
