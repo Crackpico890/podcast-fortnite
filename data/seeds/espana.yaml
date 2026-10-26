@@ -1,0 +1,30 @@
+# Lista maestra de España (semillas a mano).
+#
+# Esto es solo el punto de partida: el sistema añade solo a los españoles que encuentra
+# en Liquipedia y Fortnite Tracker. Lo que pongas aquí manda sobre lo automático.
+#
+# Campos: name, kind (player | team | org | caster | creator | desconocido), aliases,
+# country, region, team, city, x, youtube_channel_id, twitch, epic_name, liquipedia,
+# ambiguous, verified.
+#
+# city: SOLO si el propio jugador lo ha hecho público (bio, entrevistas, Liquipedia).
+# ambiguous: true cuando el nombre también es una palabra normal o una sigla
+#   (solo se detecta con la mayúscula exacta o como @usuario).
+# verified: false hasta que alguien compruebe a mano que los datos son correctos.
+
+entidades:
+  # Nombres que dio kikopico el 2026-10-26. Falta confirmar si cada uno es jugador o equipo,
+  # su equipo actual y sus redes: el cruce con Liquipedia lo completa.
+  - {name: Zyrex, kind: desconocido, country: ES, region: EU}
+  - {name: KPI, kind: desconocido, country: ES, region: EU, ambiguous: true}
+  - {name: Zenn, kind: desconocido, country: ES, region: EU}
+  - {name: Artic, kind: desconocido, country: ES, region: EU, ambiguous: true}
+  - {name: TGA, kind: desconocido, country: ES, region: EU, ambiguous: true}
+  - {name: Korx, kind: desconocido, country: ES, region: EU}
+  - {name: Fera, kind: desconocido, country: ES, region: EU, ambiguous: true}
+  - {name: Locked, kind: desconocido, country: ES, region: EU, ambiguous: true}
+
+  # Organizaciones españolas de esports (confirmar si tienen equipo de Fortnite ahora mismo).
+  - {name: Team Heretics, kind: org, aliases: [Heretics], country: ES, region: EU}
+  - {name: Team Queso, kind: org, country: ES, region: EU}
+  - {name: Movistar KOI, kind: org, aliases: [KOI], country: ES, region: EU, ambiguous: true}
