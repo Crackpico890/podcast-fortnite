@@ -133,10 +133,12 @@ def test_full_pipeline_and_digest():
         ],
     )
     assert process.run(conn, NOW) == 3
-    grouped = digest.stories(conn, now=NOW)
+    day = digest.yesterday(NOW + timedelta(days=1))
+    assert day == NOW.date()
+    grouped = digest.stories(conn, day)
     assert len(grouped["espana"]) == 1
     assert grouped["espana"][0]["level"] == rank.CONFIRMADO
-    text = digest.render(grouped, NOW)
+    text = digest.render(grouped, day)
     assert "[CONFIRMADO]" in text and "(2 fuentes)" in text
     assert text.index("España") < text.index("Torneos")
 
@@ -174,3 +176,39 @@ def test_fetch_retries_once_after_429(monkeypatch):
         assert len(calls) == 2
         calls.clear()
         assert feeds.fetch("https://news.example/rss", client) is None  # sin reintento fuera de Reddit
+
+
+def test_non_competitive_news_is_left_out():
+    collab = [item("Fortnite Confirms One Piece Collab With New Teaser Trailer")]
+    fncs = [item("Fortnite Solo FNCS 2026 Grand Finals: Live results")]
+    assert not rank.relevant(collab, [])
+    assert rank.section(rank.CONFIRMADO, "", set(), rank.relevant(collab, [])) == "fuera"
+    assert rank.relevant(fncs, [])
+    assert rank.relevant([item("Peterbot stream highlights")], [Entity(name="Peterbot")])
+
+
+def test_brand_name_alone_does_not_match_fortnite_org():
+    m = Matcher([Entity(name="Fortnite", kind="org", x="FortniteGame", handle_only=True)])
+    assert m.find("Fortnite anuncia una nueva skin") == []
+    assert m.find("nueva temporada", author="FortniteGame")
+
+
+def test_digest_skips_discarded_stories():
+    conn = db.connect(":memory:")
+    db.save_items(conn, [item("Fortnite Confirms One Piece Collab"), item("Cash Cup EU: resultados", author="AS")])
+    process.run(conn, NOW)
+    grouped = digest.stories(conn, NOW.date())
+    text = digest.render(grouped, NOW.date())
+    assert "One Piece" not in text and "Cash Cup" in text
+
+
+def test_day_window_runs_from_6_to_6_in_madrid():
+    from datetime import date
+
+    # La hora cambia la madrugada del 25/10/2026: el día 24 empieza en verano y acaba en invierno.
+    start, end = digest.day_window(date(2026, 10, 24))
+    assert start == datetime(2026, 10, 24, 4, tzinfo=timezone.utc)  # 6:00 CEST
+    assert end == datetime(2026, 10, 25, 5, tzinfo=timezone.utc)  # 6:00 CET
+    # A las 6:30 del lunes, "ayer" es el domingo; a las 5:00 todavía es el sábado.
+    assert digest.yesterday(datetime(2026, 10, 26, 5, 30, tzinfo=timezone.utc)) == date(2026, 10, 25)
+    assert digest.yesterday(datetime(2026, 10, 26, 4, 0, tzinfo=timezone.utc)) == date(2026, 10, 24)

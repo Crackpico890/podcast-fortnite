@@ -33,6 +33,8 @@ class Entity:
     liquipedia: str = ""
     # Alias que también son palabras normales ("locked", "KPI"): solo cuentan con la mayúscula exacta o como @usuario.
     ambiguous: bool = False
+    # Solo se reconoce por su cuenta (@usuario o autor), nunca por el nombre en el texto ("Fortnite").
+    handle_only: bool = False
     verified: bool = False
     source: str = "seed"
 
@@ -87,7 +89,7 @@ class Matcher:
             handles = [h for h in (e.x, e.twitch) if h]
             for h in handles:
                 self._patterns.append((re.compile(rf"@{re.escape(h.lstrip('@'))}\b", re.I), e))
-            for alias in e.all_aliases():
+            for alias in [] if e.handle_only else e.all_aliases():
                 flags = 0 if e.ambiguous else re.I
                 self._patterns.append((re.compile(rf"(?<![\w@]){re.escape(alias)}(?!\w)", flags), e))
 

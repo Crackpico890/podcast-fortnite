@@ -3,7 +3,7 @@
 import html
 import logging
 import sqlite3
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from zoneinfo import ZoneInfo
 
 import httpx
@@ -23,13 +23,30 @@ LEVEL_MARK = {"oficial": "OFICIAL", "confirmado": "CONFIRMADO", "prensa": "PRENS
 PER_SECTION = 12
 
 
-def stories(conn: sqlite3.Connection, hours: int = 24, now: datetime | None = None) -> dict[str, list[dict]]:
-    now = now or datetime.now(timezone.utc)
-    since = (now - timedelta(hours=hours)).isoformat()
+# El episodio de un día cuenta lo que pasó el día anterior. El "día" va de 6:00 a 6:00 de Madrid
+# para que entren los torneos de NA, que acaban de madrugada en España.
+DAY_STARTS_AT_HOUR = 6
+
+
+def day_window(day: date) -> tuple[datetime, datetime]:
+    start = datetime.combine(day, time(DAY_STARTS_AT_HOUR), tzinfo=ZoneInfo(TIMEZONE))
+    return start.astimezone(timezone.utc), (start + timedelta(days=1)).astimezone(timezone.utc)
+
+
+def yesterday(now: datetime | None = None) -> date:
+    now = (now or datetime.now(timezone.utc)).astimezone(ZoneInfo(TIMEZONE))
+    return (now - timedelta(hours=DAY_STARTS_AT_HOUR)).date() - timedelta(days=1)
+
+
+def stories(conn: sqlite3.Connection, day: date) -> dict[str, list[dict]]:
+    start, end = day_window(day)
+    rows = conn.execute(
+        "SELECT * FROM stories WHERE last_seen >= ? AND first_seen < ? ORDER BY score DESC",
+        (start.isoformat(), end.isoformat()),
+    ).fetchall()
     out: dict[str, list[dict]] = {key: [] for key, _ in SECTIONS}
-    rows = conn.execute("SELECT * FROM stories WHERE last_seen >= ? ORDER BY score DESC", (since,)).fetchall()
     for s in rows:
-        if len(out[s["section"]]) >= PER_SECTION:
+        if s["section"] not in out or len(out[s["section"]]) >= PER_SECTION:
             continue
         links = conn.execute(
             "SELECT url, author, source FROM items WHERE story_id=? ORDER BY published_at", (s["id"],)
@@ -38,10 +55,9 @@ def stories(conn: sqlite3.Connection, hours: int = 24, now: datetime | None = No
     return out
 
 
-def render(grouped: dict[str, list[dict]], now: datetime | None = None) -> str:
+def render(grouped: dict[str, list[dict]], day: date) -> str:
     """Texto en HTML simple para Telegram."""
-    now = (now or datetime.now(timezone.utc)).astimezone(ZoneInfo(TIMEZONE))
-    lines = [f"<b>Resumen Fortnite competitivo · {now:%d/%m/%Y}</b>"]
+    lines = [f"<b>Resumen Fortnite competitivo · lo que pasó el {day:%d/%m/%Y}</b>"]
     total = 0
     for key, title in SECTIONS:
         items = grouped.get(key) or []
@@ -57,7 +73,7 @@ def render(grouped: dict[str, list[dict]], now: datetime | None = None) -> str:
             link = f' <a href="{html.escape(first)}">fuente</a>' if first else ""
             lines.append(f"• [{mark}] {head} ({n} fuente{'s' if n != 1 else ''}){link}")
     if total == 0:
-        lines.append("\nNo hay nada nuevo en las últimas 24 horas. Revisa que las fuentes funcionan.")
+        lines.append("\nNo hay nada de competitivo ese día. Revisa que las fuentes funcionan.")
     return "\n".join(lines)
 
 

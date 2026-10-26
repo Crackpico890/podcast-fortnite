@@ -3,8 +3,11 @@
 
 entidades:
   # Oficiales de Epic: lo que publican cuenta como "oficial".
-  - {name: Fortnite, kind: org, x: FortniteGame}
+  - {name: Fortnite, kind: org, x: FortniteGame, handle_only: true}
   - {name: Fortnite Competitive, kind: org, aliases: [FNCompetitive], x: FNCompetitive}
+
+  # Organizadores de torneos.
+  - {name: WarLegend, kind: org, aliases: [War Legend, War Legends, WL Fortnite]}
 
   # Insiders y filtradores conocidos (sus noticias son "rumor" hasta que se confirmen).
   - {name: HYPEX, kind: creator, x: HYPEX, ambiguous: true}
