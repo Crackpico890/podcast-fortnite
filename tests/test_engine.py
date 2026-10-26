@@ -314,3 +314,12 @@ def test_first_episode_script_is_valid():
     parts = audio.parse(Path("episodios/2026-10-26.txt").read_text(encoding="utf-8"))
     assert {p.speaker for p in parts} == {"", "JAVI", "DANI"}
     assert parts[0].text == "intro" and parts[-1].text == "outro"
+
+
+def test_script_blocks_split_on_music_and_keep_stage_directions_for_gemini():
+    from radio import audio
+
+    parts = audio.parse("[MUSICA intro]\nJAVI: Hola (ríe)\nDANI: Hey\n[MUSICA cortinilla]\nJAVI: Fin")
+    groups = audio.blocks(parts)
+    assert [[p.speaker for p in g] for g in groups] == [[""], ["JAVI", "DANI"], [""], ["JAVI"]]
+    assert groups[1][0].raw == "Hola (ríe)" and groups[1][0].text == "Hola"
