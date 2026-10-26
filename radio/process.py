@@ -21,11 +21,13 @@ def _load_open_clusters(conn: sqlite3.Connection, matcher: Matcher, since: str) 
     return list(clusters.values())
 
 
-def run(conn: sqlite3.Connection, now: datetime | None = None) -> int:
+def run(conn: sqlite3.Connection, now: datetime | None = None, days: int | None = None) -> int:
+    """days: cuántos días hacia atrás mirar. Por defecto los últimos 3; más para rehacerlo todo."""
     now = now or datetime.now(timezone.utc)
     matcher = Matcher(load_all(conn))
     by_id = {e.id: e for e in matcher.entities}
-    since = (now - WINDOW - timedelta(hours=24)).isoformat()
+    lookback = timedelta(days=days) if days else WINDOW + timedelta(hours=24)
+    since = (now - lookback).isoformat()
     clusters = _load_open_clusters(conn, matcher, since)
 
     new_rows = conn.execute(
@@ -64,7 +66,7 @@ def run(conn: sqlite3.Connection, now: datetime | None = None) -> int:
                 headline,
                 lvl,
                 rank.score(c.items, lvl, reg, story_tags, now),
-                rank.section(lvl, reg, story_tags, rank.relevant(c.items, entities)),
+                rank.section(lvl, reg, story_tags, rank.relevant(c.items, entities), rank.sensitive(c.items)),
                 c.story_id,
             ),
         )
