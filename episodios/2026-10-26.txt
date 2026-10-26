@@ -1,7 +1,8 @@
 # Radio Fortnite · Programa 1 · lunes 26 de octubre de 2026
 # Cuenta lo del viernes 23 al domingo 25 y lo importante de la semana en torneos.
-# Fuentes: Liquipedia (CC BY-SA), Fortnite Tracker, Esports Charts, Hotspawn, esports.gg,
-# Fortnite Comp Report y r/FortniteCompetitive. Sin resultados inventados.
+# Fuentes (van en la descripción del episodio, nunca se dicen en voz alta): Liquipedia (CC BY-SA),
+# Fortnite Tracker, Hotspawn, esports.gg, Fortnite Comp Report y r/FortniteCompetitive.
+# Música: Kevin MacLeod (incompetech.com), CC BY 4.0. Sin resultados inventados.
 
 [MUSICA intro]
 JAVI: ¡Buenos días, buenas tardes y buenas noches, que esto es Fortnite y aquí nadie duerme! Estáis escuchando Radio Fortnite, el programa número uno. Literalmente, porque es el primero.
@@ -12,7 +13,7 @@ JAVI: Pues hoy vas a tener datos para defenderte, porque hay alguien que ha estu
 [MUSICA cortinilla]
 
 JAVI: Lo primero, lo gordo. Hoy lunes y mañana martes se juega la gran final de la FNCS en solitario. Cien jugadores por región, seis partidas cada día, doce en total.
-DANI: Y con premio, que es lo que me gusta. Solo en Europa hay en juego doscientos cincuenta y tres mil quinientos dólares, según Liquipedia. Y el que gane se lleva sesenta mil.
+DANI: Y con premio, que es lo que me gusta. Solo en Europa hay en juego doscientos cincuenta y tres mil quinientos dólares. Y el que gane se lleva sesenta mil.
 JAVI: Sesenta mil dólares por ganar en solitario. Sin dúo al que echarle la culpa.
 DANI: Eso es lo peor del solo, Javi. Si mueres, la culpa es tuya. O de la zona.
 JAVI: Siempre la zona. En total, entre todas las regiones, la final reparte más de seiscientos mil dólares. Europa juega hoy por la tarde-noche, y Norteamérica de madrugada, hora española.
@@ -46,28 +47,23 @@ JAVI: No lo has dicho tú, lo he dicho yo.
 DANI: Pero yo lo he apuntado. Eso cuenta.
 [MUSICA cortinilla]
 
-JAVI: Más torneos del fin de semana. Se jugó el primer evento de las Arenas Cash Cup. Empezó Oceanía el viernes y el domingo siguieron Brasil, Norteamérica Central y Norteamérica Oeste. Lo tenéis todo en Fortnite Tracker.
+JAVI: Más torneos del fin de semana. Se jugó el primer evento de las Arenas Cash Cup. Empezó Oceanía el viernes y el domingo siguieron Brasil, Norteamérica Central y Norteamérica Oeste.
 DANI: Las Cash Cups de Arenas, para el que no lo sepa, son la puerta de entrada para el que viene desde abajo. Ahí se ven caras nuevas.
-JAVI: Y una noticia para ir apuntando en el calendario. Según Fortnite Comp Report, ya hay fechas para la FNCS en solitario de Reload. Primera ronda de clasificatorias el tres y el cuatro de noviembre, segunda ronda el siete y tercera el ocho. Y los mil primeros del Power Ranking se saltan la primera ronda.
+JAVI: Y una noticia para ir apuntando en el calendario: ya hay fechas para la FNCS en solitario de Reload. Primera ronda de clasificatorias el tres y el cuatro de noviembre, segunda ronda el siete y tercera el ocho. Y los mil primeros del Power Ranking se saltan la primera ronda.
 DANI: O sea, que el que esté en el top mil se ahorra un día de sufrimiento. Un día menos de zona.
-JAVI: Y en cuanto a los números de la temporada: Esports Charts ha sacado las cifras de audiencia del Major 1 y del Global Championship. Cuando las tengamos bien desmenuzadas, os las contamos.
 [MUSICA cortinilla]
 
 JAVI: Y ahora, Dani, tu momento. Análisis táctico.
-DANI: ¡Por fin! Atención, porque esto me da la razón. Un usuario de la comunidad competitiva de Reddit ha cogido mil quinientas partidas de la FNCS en solitario y ha dibujado un mapa de hacia dónde puede moverse la zona.
+DANI: ¡Por fin! Atención, porque esto me da la razón. Alguien de la comunidad competitiva ha cogido mil quinientas partidas de la FNCS en solitario y ha dibujado un mapa de hacia dónde puede moverse la zona.
 JAVI: Mil quinientas partidas. Eso es más de lo que has jugado tú en tu vida.
 DANI: Eso es mentira. Bueno, es verdad. Pero la idea es buenísima. Si sabes dónde no va a acabar nunca la zona, no aterrizas ahí pensando en el final. Eliges un spot que te deje rotar hacia las zonas que más se repiten.
 JAVI: Para una final en solitario es oro. En solo no tienes compañero que te dé información, así que rotar pronto y por el borde bueno es media partida.
 DANI: Exacto. Y yo, a partir de hoy, en vez de quejarme de la zona, voy a estudiarla. Bueno, voy a seguir quejándome, pero con datos.
 [MUSICA cortinilla]
 
-JAVI: Un par de cosas más de la comunidad. En Reddit hay jugadores con dudas sobre la Ranked Cup de Cero Construcción. Uno cuenta que subió de bronce a diamante en diez partidas, quedó segundo, y solo le dieron el paraguas y la mochila, no la skin.
+JAVI: Una cosa más de la comunidad. Hay jugadores con dudas sobre la Ranked Cup de Cero Construcción. Uno cuenta que subió de bronce a diamante en diez partidas, quedó segundo, y solo le dieron el paraguas y la mochila, no la skin.
 DANI: Subir de bronce a diamante en diez partidas y que no te den la skin. Eso sí que es una tragedia, Javi.
 JAVI: Si alguien de Epic lo aclara, os lo contamos. Que de momento es solo una duda de un jugador.
-DANI: Y otra: los editores de Liquipedia de Fortnite, que son los que nos dan muchos de los datos que os contamos, piden ayuda a la comunidad con una encuesta cortita sobre cómo cubrir los torneos.
-JAVI: Desde aquí, gracias a Liquipedia. Sin ellos, este programa sería la mitad de largo.
-DANI: Y la mitad de bueno.
-JAVI: Eso no te lo compro.
 [MUSICA cortinilla]
 
 JAVI: Y en España, fichajes y movimientos del fin de semana: no hemos detectado ninguno. Ni fichajes, ni salidas, ni cambios de región. Si sabéis de alguno, aquí estamos.
